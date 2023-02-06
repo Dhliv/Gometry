@@ -6,7 +6,7 @@ import (
 )
 
 type cyclicPolygon struct {
-	Polygon *models.Polygon
+	Polygon models.Polygon
 	Times   int
 }
 
