@@ -159,3 +159,23 @@ func (P *Polygon) SortClockwise() {
 
 	P.Points = &sortedPolygon
 }
+
+// Deletes contiguos points that are equal.
+func (P *Polygon) DeleteRepeatedPoints() {
+	var neoPolygon []*Point = make([]*Point, 0)
+	var A, B *Point
+	var n int = len(*P.Points)
+
+	for i := 0; i < n; i++ {
+		A = (*P.Points)[i]
+		B = (*P.Points)[(i+1)%n]
+
+		if A.Equal(B) {
+			continue
+		}
+
+		neoPolygon = append(neoPolygon, A)
+	}
+
+	P.Points = &neoPolygon
+}
