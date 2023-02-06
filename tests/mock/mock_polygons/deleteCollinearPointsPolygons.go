@@ -7,7 +7,7 @@ import (
 
 // Polygons without collinear segments
 var (
-	NCPolygon     *models.Polygon = models.NewPolygon(A, B, C, D)                         // Same
+	NCPolygon     *models.Polygon = models.NewPolygon(A, B, D, C)                         // Same
 	NCPolygon1                    = models.NewPolygon(S1, S7, S6, S5, S4, S3, S2)         // Same
 	NCPolygon2                    = models.NewPolygon(S1, S7, S6, S3, S2)                 // Same
 	NCPolygon3                    = models.NewPolygon(S8, S1, S2, S6)                     // Same

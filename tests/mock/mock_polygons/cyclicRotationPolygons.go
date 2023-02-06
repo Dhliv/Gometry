@@ -6,7 +6,7 @@ import (
 )
 
 type cyclicPolygon struct {
-	Polygon *models.Polygon
+	Polygon models.Polygon
 	Times   int
 }
 
@@ -15,7 +15,7 @@ var (
 )
 
 var (
-	CyclicPolygon     *models.Polygon = models.NewPolygon(A, B, C, D)
+	CyclicPolygon     *models.Polygon = models.NewPolygon(A, B, D, C)
 	CyclicPolygon1                    = models.NewPolygon(S7, S6, S5, S4, S3, S2, S1)
 	CyclicPolygon2                    = models.NewPolygon(S6, S3, S2, S1, S7)
 	CyclicPolygon3                    = models.NewPolygon(S6, S8, S1, S2)

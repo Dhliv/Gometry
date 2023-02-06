@@ -1,6 +1,8 @@
 package models
 
 import (
+	"math"
+
 	. "github.com/Dhliv/Gometry/src/utils"
 )
 
@@ -107,6 +109,72 @@ func (P *Polygon) CyclicRotation(times int) {
 	for i := 0; i < n; i++ {
 		j := (i + times) % n
 		neoPolygon = append(neoPolygon, (*P.Points)[j])
+	}
+
+	P.Points = &neoPolygon
+}
+
+// Determines wheter point 'P' is on the perimeter of 'polygon'.
+// TODO
+func (Pol *Polygon) PointInPolygonPerimeter(P *Point) bool {
+	return true
+}
+
+/*
+Calculates the signed area of 'polygon'. Area would be < 0 when polygon is
+given in clockwise order. We could make this function ignore that order
+to always return the positive area of polygon.
+*/
+func (P *Polygon) Area(ignoreClockwiseOrder bool) float64 {
+	var area float64 = 0
+	var n int = len(*P.Points)
+	var A, B *Point
+
+	for i := 0; i < n; i++ {
+		A = (*P.Points)[i]
+		B = (*P.Points)[(i+1)%n]
+
+		area += (A.X*B.Y - B.X*A.Y) / float64(2)
+	}
+
+	if ignoreClockwiseOrder {
+		area = math.Abs(area)
+	}
+
+	return area
+}
+
+// Sorts 'polygon' in clockwise order.
+func (P *Polygon) SortClockwise() {
+	var area float64 = P.Area(false)
+
+	if area < 0.0 { // Polygon is already sorted clockwise.
+		return
+	}
+
+	var sortedPolygon []*Point = make([]*Point, 0)
+	for i := len(*P.Points) - 1; i >= 0; i-- {
+		sortedPolygon = append(sortedPolygon, (*P.Points)[i])
+	}
+
+	P.Points = &sortedPolygon
+}
+
+// Deletes contiguos points that are equal.
+func (P *Polygon) DeleteRepeatedPoints() {
+	var neoPolygon []*Point = make([]*Point, 0)
+	var A, B *Point
+	var n int = len(*P.Points)
+
+	for i := 0; i < n; i++ {
+		A = (*P.Points)[i]
+		B = (*P.Points)[(i+1)%n]
+
+		if A.Equal(B) {
+			continue
+		}
+
+		neoPolygon = append(neoPolygon, A)
 	}
 
 	P.Points = &neoPolygon
