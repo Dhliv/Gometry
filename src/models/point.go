@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"math"
 
 	. "github.com/Dhliv/Gometry/src/utils"
@@ -43,6 +44,11 @@ func (Pe *Point) Equal(P *Point) bool {
 
 func (Pe *Point) DotProduct(P *Point) float64 {
 	return Pe.X*P.X + Pe.Y*P.Y
+}
+
+// Transform point to string literal in the form (x, y).
+func (P *Point) ToString() string {
+	return fmt.Sprintf("(%v, %v)", P.X, P.Y)
 }
 
 // Calculates the norm of 'vector' to 'origin'.
