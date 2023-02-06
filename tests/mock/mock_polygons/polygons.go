@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	Polygon     *models.Polygon = models.NewPolygon(A, B, C, D)
+	Polygon     *models.Polygon = models.NewPolygon(A, B, D, C)
 	Polygon1                    = models.NewPolygon(S1, S7, S6, S5, S4, S3, S2)
 	Polygon2                    = models.NewPolygon(S1, S7, S6, S3, S2)
 	Polygon3                    = models.NewPolygon(S8, S1, S2, S6)
