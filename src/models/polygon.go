@@ -143,3 +143,19 @@ func (P *Polygon) Area(ignoreClockwiseOrder bool) float64 {
 
 	return area
 }
+
+// Sorts 'polygon' in clockwise order.
+func (P *Polygon) SortClockwise() {
+	var area float64 = P.Area(false)
+
+	if area < 0.0 { // Polygon is already sorted clockwise.
+		return
+	}
+
+	var sortedPolygon []*Point = make([]*Point, 0)
+	for i := len(*P.Points) - 1; i >= 0; i-- {
+		sortedPolygon = append(sortedPolygon, (*P.Points)[i])
+	}
+
+	P.Points = &sortedPolygon
+}
