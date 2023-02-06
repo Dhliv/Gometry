@@ -1,6 +1,8 @@
 package models
 
 import (
+	"math"
+
 	. "github.com/Dhliv/Gometry/src/utils"
 )
 
@@ -110,4 +112,34 @@ func (P *Polygon) CyclicRotation(times int) {
 	}
 
 	P.Points = &neoPolygon
+}
+
+// Determines wheter point 'P' is on the perimeter of 'polygon'.
+// TODO
+func (Pol *Polygon) PointInPolygonPerimeter(P *Point) bool {
+	return true
+}
+
+/*
+Calculates the signed area of 'polygon'. Area would be < 0 when polygon is
+given in clockwise order. We could make this function ignore that order
+to always return the positive area of polygon.
+*/
+func (P *Polygon) Area(ignoreClockwiseOrder bool) float64 {
+	var area float64 = 0
+	var n int = len(*P.Points)
+	var A, B *Point
+
+	for i := 0; i < n; i++ {
+		A = (*P.Points)[i]
+		B = (*P.Points)[(i+1)%n]
+
+		area += (A.X*B.Y - B.X*A.Y) / float64(2)
+	}
+
+	if ignoreClockwiseOrder {
+		area = math.Abs(area)
+	}
+
+	return area
 }
