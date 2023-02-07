@@ -234,20 +234,7 @@ func (AB *Line) DoesSegmentsOverlap(PQ *Line) bool {
 }
 
 /*
-def angle_between_segments(A: point, P: point, B: point):
-
-	"""
-	Calculates the angle between segment AP and segment PB.
-	"""
-
-	A_seen_by_P: point = point(A.x - P.x, A.y - P.y, 0)
-	B_seen_by_P: point = point(B.x - P.x, B.y - P.y, 0)
-	norm_AB = vector_norm(A, P)
-	norm_PQ = vector_norm(B, P)
-	dot_product = A_seen_by_P.dot_product(B_seen_by_P)
-
-	result = dot_product/(norm_AB*norm_PQ)
-	return acos(result)
+Calculates the angle between segment AP and segment PB.
 */
 func (AP *Line) AngleBetweenSegments(PB *Line) float64 {
 	var A_seen_by_P, B_seen_by_P *Point
