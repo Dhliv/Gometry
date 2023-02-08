@@ -10,8 +10,8 @@ import (
 ? Separate the concept of a Line of the concept of Segment?
 */
 type Line struct {
-	A Point
-	B Point
+	A *Point
+	B *Point
 }
 
 /*
@@ -105,7 +105,7 @@ func ParallelLineOfALineAndAPoint(L *Line, P *Point) *Line {
 	var slope *Point = L.SlopeVector()
 	var p1 *Point = NewPoint(P.X+slope.X*10, P.Y+slope.Y*10)
 	var p2 *Point = NewPoint(P.X+slope.X*10, P.Y+slope.Y*10)
-	return &Line{*p1, *p2}
+	return &Line{p1, p2}
 }
 
 /*
@@ -161,30 +161,30 @@ Returns 1 if they intersect, 0 otherwise.
 */
 func (AB *Line) HasIntersection(CD *Line) int8 {
 	var o1, o2, o3, o4 int8
-	o1 = GetOrientation(&AB.A, &AB.B, &CD.A)
-	o2 = GetOrientation(&AB.A, &AB.B, &CD.B)
+	o1 = GetOrientation(AB.A, AB.B, CD.A)
+	o2 = GetOrientation(AB.A, AB.B, CD.B)
 
-	o3 = GetOrientation(&CD.A, &CD.B, &AB.A)
-	o4 = GetOrientation(&CD.A, &CD.B, &AB.B)
+	o3 = GetOrientation(CD.A, CD.B, AB.A)
+	o4 = GetOrientation(CD.A, CD.B, AB.B)
 
 	// General case
 	if o1 != o2 && o3 != o4 {
 		return 1
 	}
 
-	if o1 == COLLINEAR_ORIENTATION && AB.PointOnSegment(&CD.A) {
+	if o1 == COLLINEAR_ORIENTATION && AB.PointOnSegment(CD.A) {
 		return 1
 	}
 
-	if o2 == COLLINEAR_ORIENTATION && AB.PointOnSegment(&CD.B) {
+	if o2 == COLLINEAR_ORIENTATION && AB.PointOnSegment(CD.B) {
 		return 1
 	}
 
-	if o3 == COLLINEAR_ORIENTATION && CD.PointOnSegment(&AB.A) {
+	if o3 == COLLINEAR_ORIENTATION && CD.PointOnSegment(AB.A) {
 		return 1
 	}
 
-	if o4 == COLLINEAR_ORIENTATION && CD.PointOnSegment(&AB.B) {
+	if o4 == COLLINEAR_ORIENTATION && CD.PointOnSegment(AB.B) {
 		return 1
 	}
 
@@ -198,10 +198,10 @@ Determines wheter segment AB (this) and PQ (other line) have an intersection, bu
 func (AB *Line) DoesSegmentsIntersect(PQ *Line) bool {
 	var o1, o2, o3, o4, has_intersection int8
 	var p_intersection *Point
-	o1 = GetOrientation(&AB.A, &AB.B, &PQ.A)
-	o2 = GetOrientation(&AB.A, &AB.B, &PQ.B)
-	o3 = GetOrientation(&PQ.A, &PQ.B, &AB.A)
-	o3 = GetOrientation(&PQ.A, &PQ.B, &AB.B)
+	o1 = GetOrientation(AB.A, AB.B, PQ.A)
+	o2 = GetOrientation(AB.A, AB.B, PQ.B)
+	o3 = GetOrientation(PQ.A, PQ.B, AB.A)
+	o3 = GetOrientation(PQ.A, PQ.B, AB.B)
 
 	if o1+o2+o3+o4 == 0 { // Segments AB and PQ overlap.
 		return false
@@ -222,12 +222,12 @@ func (AB *Line) DoesSegmentsIntersect(PQ *Line) bool {
 
 func (AB *Line) DoesSegmentsOverlap(PQ *Line) bool {
 	var o1, o2, o3, o4 int8
-	o1 = GetOrientation(&AB.A, &AB.B, &PQ.A)
-	o2 = GetOrientation(&AB.A, &AB.B, &PQ.B)
-	o3 = GetOrientation(&PQ.A, &PQ.B, &AB.A)
-	o3 = GetOrientation(&PQ.A, &PQ.B, &AB.B)
+	o1 = GetOrientation(AB.A, AB.B, PQ.A)
+	o2 = GetOrientation(AB.A, AB.B, PQ.B)
+	o3 = GetOrientation(PQ.A, PQ.B, AB.A)
+	o3 = GetOrientation(PQ.A, PQ.B, AB.B)
 
-	if o1+o2+o3+o4 == 0 && PQ.PointOnSegment(&AB.A) || PQ.PointOnSegment(&AB.B) || AB.PointOnSegment(&PQ.A) || AB.PointOnSegment(&PQ.B) {
+	if o1+o2+o3+o4 == 0 && PQ.PointOnSegment(AB.A) || PQ.PointOnSegment(AB.B) || AB.PointOnSegment(PQ.A) || AB.PointOnSegment(PQ.B) {
 		return true
 	}
 	return false

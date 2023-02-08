@@ -52,7 +52,7 @@ func (P *Point) ToString() string {
 }
 
 // Calculates the norm of 'vector' to 'origin'.
-func VectorNorm(vector, origin Point) float64 {
+func VectorNorm(vector, origin *Point) float64 {
 	x := math.Pow((vector.X - origin.X), 2)
 	y := math.Pow((vector.Y - origin.Y), 2)
 
