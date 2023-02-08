@@ -36,10 +36,7 @@ func (P *Point) Translate(translationPoint *Point) {
 
 // Recieves a Point and return true if both are equal, false otherwise
 func (Pe *Point) Equal(P *Point) bool {
-	if math.Abs(Pe.X-P.X) > EPSILON || math.Abs(Pe.Y-P.Y) > EPSILON {
-		return false
-	}
-	return true
+	return math.Abs(Pe.X-P.X) <= EPSILON && math.Abs(Pe.Y-P.Y) <= EPSILON
 }
 
 func (Pe *Point) DotProduct(P *Point) float64 {
