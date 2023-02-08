@@ -38,34 +38,21 @@ func (L *Line) SlopeVector() *Point {
 }
 
 /*
-Calculates the point inside line by specifying 'y' coordinate.
+Calculates the point inside line by specifying 'y' coordinate. It assumes that Line L is not horizontal (L.Slope() == 0)
+TODO Fix with intersect two lines
 */
 func (L *Line) GetPointInsideLineByYCoordinate(y float64) *Point {
-	a1 := L.B.Y - L.A.Y
-	b1 := L.A.X - L.B.X
-	c1 := a1*(L.A.X) + b1*(L.A.Y)
+	var hLine *Line = &Line{NewPoint(0, y), NewPoint(1, y)}
 
-	if math.Abs(b1) < EPSILON {
-		return NewPoint(L.A.X, y)
-	}
-
-	if math.Abs(a1) < EPSILON {
-		//A.y == B.y
-		//The answer could be any point inside line AB
-		return NewPoint(L.A.X, y)
-	}
-
-	x := -1 * (b1*y + c1) / a1
-
-	return NewPoint(x, y)
+	return L.IntersectionPointOnALine(hLine)
 }
 
 /*
-Do the ortogonal projection of C on Line AB, named D. That means Line(A,B) * Line(C,D) == 0
+Return a Point D like Line CD is orthogonal to Line AB. That means Line(A,B) * Line(C,D) == 0
 
 ? Is this really orthogonal projection?
 */
-func (L *Line) OrthogonalProjection(C *Point) *Point {
+func (L *Line) OrthogonalLinePoint(C *Point) *Point {
 	var x, y float64
 
 	if math.Abs(L.A.X-L.B.X) < EPSILON {
