@@ -14,6 +14,10 @@ type Line struct {
 	B *Point
 }
 
+func NewLine(A, B *Point) *Line {
+	return &Line{A: A, B: B}
+}
+
 /*
 Returns the slope of the line
 ? Report when the slope is infinite?
@@ -194,6 +198,8 @@ func (AB *Line) HasIntersection(CD *Line) int8 {
 /*
 Determines wheter segment AB (this) and PQ (other line) have an intersection, but doesn't overlap.
 * Maybe mix this and does_segments overlap ? And call it somelike "PointsIntersecting", 0 if doesnt overlap nor intersect, 1 if insersect, 2 if overlap
+
+TODO return intersection as well.
 */
 func (AB *Line) DoesSegmentsIntersect(PQ *Line) bool {
 	var o1, o2, o3, o4, has_intersection int8
