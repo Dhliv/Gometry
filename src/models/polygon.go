@@ -115,9 +115,22 @@ func (P *Polygon) CyclicRotation(times int) {
 }
 
 // Determines wheter point 'P' is on the perimeter of 'polygon'.
-// TODO
 func (Pol *Polygon) PointInPolygonPerimeter(P *Point) bool {
-	return true
+	var line *Line
+	var A, B *Point
+	var n int = len(*Pol.Points)
+
+	for i := 0; i < n; i++ {
+		A = (*Pol.Points)[i]
+		B = (*Pol.Points)[(i+1)%n]
+		line = NewLine(A, B)
+
+		if line.PointOnSegment(P) {
+			return true
+		}
+	}
+
+	return false
 }
 
 /*
