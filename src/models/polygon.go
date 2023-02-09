@@ -115,9 +115,22 @@ func (P *Polygon) CyclicRotation(times int) {
 }
 
 // Determines wheter point 'P' is on the perimeter of 'polygon'.
-// TODO
 func (Pol *Polygon) PointInPolygonPerimeter(P *Point) bool {
-	return true
+	var line *Line
+	var A, B *Point
+	var n int = len(*Pol.Points)
+
+	for i := 0; i < n; i++ {
+		A = (*Pol.Points)[i]
+		B = (*Pol.Points)[(i+1)%n]
+		line = NewLine(A, B)
+
+		if line.PointOnSegment(P) {
+			return true
+		}
+	}
+
+	return false
 }
 
 /*
@@ -208,7 +221,18 @@ func (Pol *Polygon) PointInPolygon(P *Point) bool {
 	return math.Abs(angle_sum) > math.Pi
 }
 
-// TODO
+// Returns wheter current polygon is inside 'PObjetive' polygon.
+//
+// 🚧 Take note that you should check if polygons have intersection before using this method. 🚧
 func (P *Polygon) InsidePolygon(PObjetive *Polygon) bool {
-	return true
+	var inside bool = true
+
+	for _, p := range *P.Points {
+		if !PObjetive.PointInPolygon(p) {
+			inside = false
+			break
+		}
+	}
+
+	return inside
 }
