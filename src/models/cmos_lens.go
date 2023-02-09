@@ -41,8 +41,7 @@ func calcVFOV_HFOV(FOV float64, sensor *SensorDimensions) (VFOV float64, HFOV fl
 }
 
 /*
-Constructor for CMOS_lens. Relies on format to get an specified sensor and FOV
-to calculate HFOV and VFOV.
+Constructor for CMOS_lens. Relies on format to get an specified sensor and FOV to calculate HFOV and VFOV.
 
 Returns: CMOS_Lens and nil if sensor has been found, nil and sensor not found error otherwise.
 */
