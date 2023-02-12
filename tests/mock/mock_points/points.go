@@ -31,4 +31,6 @@ var (
 	S22               = models.NewPoint(2, 2)
 	S23               = models.NewPoint(6, 2)
 	S24               = models.NewPoint(8, 8)
+
+	AllPoints []*models.Point = []*models.Point{A, B, C, D, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20, S21, S22, S23, S24}
 )
