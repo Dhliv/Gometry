@@ -47,6 +47,6 @@ func (Q *Quadrilateral) Translate(originPoint *Point) {
 }
 
 // Represent the quadrilateral as Polygon
-func (Q *Quadrilateral) ToWeilerAthertonRepresentation() Polygon {
-	return *NewPolygon(Q.A, Q.B, Q.D, Q.C)
+func (Q *Quadrilateral) ToWeilerAthertonRepresentation() *Polygon {
+	return NewPolygon(Q.A, Q.B, Q.D, Q.C)
 }
