@@ -48,7 +48,12 @@ func (Pe *Point) DotProduct(P *Point) float64 {
 
 // Transform point to string literal in the form (x, y).
 func (P *Point) ToString() string {
-	return fmt.Sprintf("(%v, %v)", P.X, P.Y)
+	return fmt.Sprintf("(%.2f, %.2f)", P.X, P.Y)
+}
+
+// Returns a copy of current point.
+func (P *Point) Copy() *Point {
+	return NewPoint(P.X, P.Y)
 }
 
 // Calculates the norm of 'vector' to 'origin'.
