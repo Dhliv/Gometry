@@ -34,9 +34,9 @@ type CMOS_Lens struct {
 //
 // Returns the vertical and horizontal field of view respectively.
 func calcVFOV_HFOV(FOV float64, sensor *SensorDimensions) (VFOV float64, HFOV float64) {
-	var focalLenght float64 = (sensor.Diagonal / (2 * math.Tan(ONE_GRADE_IN_RADIANS*FOV/2))) * ONE_RADIAN_IN_GRADES
-	HFOV = 2 * math.Atan(sensor.Width/focalLenght) * ONE_RADIAN_IN_GRADES
-	VFOV = 2 * math.Atan(sensor.Height/focalLenght) * ONE_RADIAN_IN_GRADES
+	var focalLength float64 = (sensor.Diagonal / (2 * math.Tan(ONE_GRADE_IN_RADIANS*FOV/2)))
+	HFOV = 2 * math.Atan(sensor.Height/(2*focalLength)) * ONE_RADIAN_IN_GRADES
+	VFOV = 2 * math.Atan(sensor.Width/(2*focalLength)) * ONE_RADIAN_IN_GRADES
 	return
 }
 
