@@ -7,7 +7,7 @@ This class contains 4 points, being (x, y). This beforementioned points represen
 the Camera Footprint of drone's camera.
 */
 type Quadrilateral struct {
-	A, B, C, D Point
+	A, B, C, D *Point
 }
 
 /*
@@ -17,7 +17,7 @@ Initialize projected quadrilateral on the form:
 
 .....C----D.....
 */
-func NewQuadrilateral(A, B, C, D Point) *Quadrilateral {
+func NewQuadrilateral(A, B, C, D *Point) *Quadrilateral {
 	return &Quadrilateral{A: A, B: B, C: C, D: D}
 }
 
@@ -47,6 +47,6 @@ func (Q *Quadrilateral) Translate(originPoint *Point) {
 }
 
 // Represent the quadrilateral as Polygon
-func (Q *Quadrilateral) ToWeilerAthertonRepresentation() Polygon {
-	return *NewPolygon(&Q.A, &Q.B, &Q.D, &Q.C)
+func (Q *Quadrilateral) ToWeilerAthertonRepresentation() *Polygon {
+	return NewPolygon(Q.A, Q.B, Q.D, Q.C)
 }

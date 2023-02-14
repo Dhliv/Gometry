@@ -7,19 +7,19 @@ direction may not be defined at the beggining, thats where 'incomplete' paramete
 to this reason as well, because the direction of entering could rely on next points that are not known.
 */
 type PointEntering struct {
-	P                                            Point
-	Intersection, Entering, Incomplete, IsSingle bool
+	P                                                *Point
+	Intersection, IsEntering, IsIncomplete, IsSingle bool
 }
 
 /*
 Constructor of PointEntering
 */
-func NewPointEntering(P *Point, Intersection, Entering, Incomplete, IsSingle bool) *PointEntering {
+func NewPointEntering(P *Point, IsIntersection, IsEntering, Incomplete, IsSingle bool) *PointEntering {
 	return &PointEntering{
-		P:            *P,
-		Intersection: Intersection,
-		Entering:     Entering,
-		Incomplete:   Incomplete,
+		P:            P,
+		Intersection: IsIntersection,
+		IsEntering:   IsEntering,
+		IsIncomplete: Incomplete,
 		IsSingle:     IsSingle,
 	}
 }
@@ -27,7 +27,7 @@ func NewPointEntering(P *Point, Intersection, Entering, Incomplete, IsSingle boo
 /*
 Constructor with default parameteres
 
-Variables entering, incomplete and isSingle are initialized to false
+Variables IsEntering, IsIncomplete and IsSingle are initialized to false
 */
 func NewDefaultPointEntering(P *Point, Intersection bool) *PointEntering {
 	return NewPointEntering(P, Intersection, false, false, false)
@@ -37,5 +37,5 @@ func NewDefaultPointEntering(P *Point, Intersection bool) *PointEntering {
 Recieves a PointEntering and return true if both are equal, false otherwise
 */
 func (Pe *PointEntering) Equal(Po *PointEntering) bool {
-	return Pe.P.Equal(&Po.P) && Pe.Entering == Po.Entering && Pe.Intersection == Po.Intersection
+	return Pe.P.Equal(Po.P) && Pe.IsEntering == Po.IsEntering && Pe.Intersection == Po.Intersection
 }

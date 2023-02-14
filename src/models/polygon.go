@@ -223,7 +223,8 @@ func (Pol *Polygon) PointInPolygon(P *Point) bool {
 
 // Returns wheter current polygon is inside 'PObjetive' polygon.
 //
-// 🚧 Take note that you should check if polygons have intersection before using this method. 🚧
+// 🚧 Take note that you should check if polygons have intersection before using this method, 'cause this method only works
+// if 'PObjetive' is convex or if there is not an intersection between current and 'PObjetive' polygons. 🚧
 func (P *Polygon) InsidePolygon(PObjetive *Polygon) bool {
 	var inside bool = true
 
@@ -235,4 +236,15 @@ func (P *Polygon) InsidePolygon(PObjetive *Polygon) bool {
 	}
 
 	return inside
+}
+
+// Returns a copy of polygon.
+func (P *Polygon) Copy() *Polygon {
+	var neoPoints []*Point
+
+	for _, p := range *P.Points {
+		neoPoints = append(neoPoints, p.Copy())
+	}
+
+	return NewPolygon(neoPoints...)
 }
