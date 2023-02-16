@@ -20,6 +20,10 @@ func NewPoint(x, y float64) *Point {
 	return &Point{X: x, Y: y}
 }
 
+func (P Point) String() string {
+	return fmt.Sprintf("(%v, %v)", P.X, P.Y)
+}
+
 // Rotates the actual point by 'beta' degrees in counter-clocwise.
 func (P *Point) Rotate(beta float64) {
 	x := math.Cos(beta)*P.X - math.Sin(beta)*P.Y
