@@ -15,6 +15,10 @@ type Line struct {
 	B *Point
 }
 
+func NewLine(A, B *Point) *Line {
+	return &Line{A: A.Copy(), B: B.Copy()}
+}
+
 func (L Line) String() string {
 	return fmt.Sprintf("(%v - %v)", L.A, L.B)
 }
@@ -43,7 +47,6 @@ func (L *Line) SlopeVector() *Point {
 }
 
 /*
-*Tested
 Calculates the point inside line by specifying 'y' coordinate. It assumes that Line L is not horizontal (L.Slope() == 0)
 */
 func (L *Line) GetPointInsideLineByYCoordinate(y float64) *Point {
@@ -53,7 +56,6 @@ func (L *Line) GetPointInsideLineByYCoordinate(y float64) *Point {
 }
 
 /*
-*Tested
 Return a Point D like Line CD is orthogonal to Line AB. That means Line(A,B) * Line(C,D) == 0
 */
 func (L *Line) OrthogonalLinePoint(C *Point) *Point {
@@ -73,25 +75,19 @@ func (L *Line) OrthogonalLinePoint(C *Point) *Point {
 }
 
 /*
-*Tested
-! Fail tests
-	Determines whether 'C' is in the line AB or not, returing true or false respectly.
+Determines whether 'C' is in the line AB or not, returing true or false respectly.
 */
-
 func (L *Line) PointInLine(C *Point) bool {
-	var a, b, left_result, right_result float64
-	a = L.A.X - L.B.X
-	b = L.A.Y - L.B.Y
-	left_result = a * C.Y
-	right_result = L.A.Y*a + b*(C.X-L.A.Y)
+	var a, b, c, result float64
+	a = L.B.Y - L.A.Y
+	b = L.A.X - L.B.X
+	c = L.A.Y*L.B.X - L.B.Y*L.A.X
+	result = a*C.X + b*C.Y + c
 
-	return math.Abs(left_result-right_result) < EPSILON
-
+	return math.Abs(result) < EPSILON
 }
 
 /*
-*Tested
-! Technically, failed the tests
 Given a Line L and a Point P, return a Line R that is parallel to L and P is in that line.
 */
 func (L *Line) ParallelLineOfALineAndAPoint(P *Point) *Line {
@@ -102,7 +98,6 @@ func (L *Line) ParallelLineOfALineAndAPoint(P *Point) *Line {
 }
 
 /*
-* Tested
 Calculate and return the intersection of line AB and line CD. The function works on the premise
 that AB and CD are not collinear.
 
@@ -128,7 +123,6 @@ func (AB *Line) IntersectionPointOnALine(CD *Line) *Point {
 }
 
 /*
-* Tested
 	Determines whether or not the point 'P' is on the segment defined by AB.
 */
 
@@ -152,38 +146,15 @@ func (L *Line) PointOnSegment(P *Point) bool {
 /*
 Determines whether or not lines AB (this line) and CD has intersection.
 
-Returns 1 if they intersect, 0 otherwise.
+Returns true if they intersect, false otherwise.
 */
-func (AB *Line) HasIntersection(CD *Line) int8 {
-	var o1, o2, o3, o4 int8
-	o1 = GetOrientation(AB.A, AB.B, CD.A)
-	o2 = GetOrientation(AB.A, AB.B, CD.B)
+func (AB *Line) HasIntersection(CD *Line) bool {
+	var m1, m2 float64
 
-	o3 = GetOrientation(CD.A, CD.B, AB.A)
-	o4 = GetOrientation(CD.A, CD.B, AB.B)
+	m1 = (AB.A.Y - AB.B.Y) * (CD.A.X - CD.B.X)
+	m2 = (CD.A.Y - CD.B.Y) * (AB.A.X - AB.B.X)
 
-	// General case
-	if o1 != o2 && o3 != o4 {
-		return 1
-	}
-
-	if o1 == COLLINEAR_ORIENTATION && AB.PointOnSegment(CD.A) {
-		return 1
-	}
-
-	if o2 == COLLINEAR_ORIENTATION && AB.PointOnSegment(CD.B) {
-		return 1
-	}
-
-	if o3 == COLLINEAR_ORIENTATION && CD.PointOnSegment(AB.A) {
-		return 1
-	}
-
-	if o4 == COLLINEAR_ORIENTATION && CD.PointOnSegment(AB.B) {
-		return 1
-	}
-
-	return 0
+	return math.Abs(m1-m2) >= EPSILON
 }
 
 /*
@@ -193,7 +164,8 @@ Determines wheter segment AB (this) and PQ (other line) have an intersection, bu
 TODO return intersection as well.
 */
 func (AB *Line) DoesSegmentsIntersect(PQ *Line) bool {
-	var o1, o2, o3, o4, has_intersection int8
+	var o1, o2, o3, o4 int8
+	var has_intersection bool
 	var p_intersection *Point
 	o1 = GetOrientation(AB.A, AB.B, PQ.A)
 	o2 = GetOrientation(AB.A, AB.B, PQ.B)
@@ -205,7 +177,7 @@ func (AB *Line) DoesSegmentsIntersect(PQ *Line) bool {
 	}
 
 	has_intersection = AB.HasIntersection(PQ)
-	if has_intersection == 0 {
+	if !has_intersection {
 		return false
 	}
 
@@ -224,7 +196,7 @@ func (AB *Line) DoesSegmentsOverlap(PQ *Line) bool {
 	o3 = GetOrientation(PQ.A, PQ.B, AB.A)
 	o4 = GetOrientation(PQ.A, PQ.B, AB.B)
 
-	if o1+o2+o3+o4 == 0 && PQ.PointOnSegment(AB.A) || PQ.PointOnSegment(AB.B) || AB.PointOnSegment(PQ.A) || AB.PointOnSegment(PQ.B) {
+	if o1+o2+o3+o4 == 0 && (PQ.PointOnSegment(AB.A) || PQ.PointOnSegment(AB.B) || AB.PointOnSegment(PQ.A) || AB.PointOnSegment(PQ.B)) {
 		return true
 	}
 	return false
