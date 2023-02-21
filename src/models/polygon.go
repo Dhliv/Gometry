@@ -67,6 +67,11 @@ func (P *Polygon) DeleteCollinearSegments() {
 	var n int = len(*P.Points)
 	var A, B, C *Point
 
+	if n <= 2 {
+		// P is not a polygon, its a line.
+		return
+	}
+
 	for i := 0; i < n; i++ {
 		A = (*P.Points)[(i-1+n)%n]
 		B = (*P.Points)[i]
