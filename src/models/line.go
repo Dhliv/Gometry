@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"math"
 
 	. "github.com/Dhliv/Gometry/src/utils"
@@ -15,7 +16,11 @@ type Line struct {
 }
 
 func NewLine(A, B *Point) *Line {
-	return &Line{A: A, B: B}
+	return &Line{A: A.Copy(), B: B.Copy()}
+}
+
+func (L Line) String() string {
+	return fmt.Sprintf("(%v - %v)", L.A, L.B)
 }
 
 /*
@@ -42,34 +47,18 @@ func (L *Line) SlopeVector() *Point {
 }
 
 /*
-Calculates the point inside line by specifying 'y' coordinate.
+Calculates the point inside line by specifying 'y' coordinate. It assumes that Line L is not horizontal (L.Slope() == 0)
 */
 func (L *Line) GetPointInsideLineByYCoordinate(y float64) *Point {
-	a1 := L.B.Y - L.A.Y
-	b1 := L.A.X - L.B.X
-	c1 := a1*(L.A.X) + b1*(L.A.Y)
+	var hLine *Line = &Line{NewPoint(0, y), NewPoint(1, y)}
 
-	if math.Abs(b1) < EPSILON {
-		return NewPoint(L.A.X, y)
-	}
-
-	if math.Abs(a1) < EPSILON {
-		//A.y == B.y
-		//The answer could be any point inside line AB
-		return NewPoint(L.A.X, y)
-	}
-
-	x := -1 * (b1*y + c1) / a1
-
-	return NewPoint(x, y)
+	return L.IntersectionPointOnALine(hLine)
 }
 
 /*
-Do the ortogonal projection of C on Line AB, named D. That means Line(A,B) * Line(C,D) == 0
-
-? Is this really orthogonal projection?
+Return a Point D like Line CD is orthogonal to Line AB. That means Line(A,B) * Line(C,D) == 0
 */
-func (L *Line) OrthogonalProjection(C *Point) *Point {
+func (L *Line) OrthogonalLinePoint(C *Point) *Point {
 	var x, y float64
 
 	if math.Abs(L.A.X-L.B.X) < EPSILON {
@@ -86,28 +75,24 @@ func (L *Line) OrthogonalProjection(C *Point) *Point {
 }
 
 /*
-	Determines whether 'C' is in the line AB or not, returing true or false respectly.
+Determines whether 'C' is in the line AB or not, returing true or false respectly.
 */
-
 func (L *Line) PointInLine(C *Point) bool {
-	var a, b, left_result, right_result float64
-	a = L.A.X - L.B.X
-	b = L.A.Y - L.B.Y
-	left_result = a * C.Y
-	right_result = L.A.Y*a + b*(C.X-L.A.Y)
+	var a, b, c, result float64
+	a = L.B.Y - L.A.Y
+	b = L.A.X - L.B.X
+	c = L.A.Y*L.B.X - L.B.Y*L.A.X
+	result = a*C.X + b*C.Y + c
 
-	return math.Abs(left_result-right_result) < EPSILON
-
+	return math.Abs(result) < EPSILON
 }
 
 /*
-Given a Line L and a Point P, return a Line that is parallel to L and P is in that line.
-
-TODO TESTING
+Given a Line L and a Point P, return a Line R that is parallel to L and P is in that line.
 */
-func ParallelLineOfALineAndAPoint(L *Line, P *Point) *Line {
+func (L *Line) ParallelLineOfALineAndAPoint(P *Point) *Line {
 	var slope *Point = L.SlopeVector()
-	var p1 *Point = NewPoint(P.X+slope.X*10, P.Y+slope.Y*10)
+	var p1 *Point = NewPoint(P.X-slope.X*10, P.Y-slope.Y*10)
 	var p2 *Point = NewPoint(P.X+slope.X*10, P.Y+slope.Y*10)
 	return &Line{p1, p2}
 }
@@ -161,38 +146,15 @@ func (L *Line) PointOnSegment(P *Point) bool {
 /*
 Determines whether or not lines AB (this line) and CD has intersection.
 
-Returns 1 if they intersect, 0 otherwise.
+Returns true if they intersect, false otherwise.
 */
-func (AB *Line) HasIntersection(CD *Line) int8 {
-	var o1, o2, o3, o4 int8
-	o1 = GetOrientation(AB.A, AB.B, CD.A)
-	o2 = GetOrientation(AB.A, AB.B, CD.B)
+func (AB *Line) HasIntersection(CD *Line) bool {
+	var m1, m2 float64
 
-	o3 = GetOrientation(CD.A, CD.B, AB.A)
-	o4 = GetOrientation(CD.A, CD.B, AB.B)
+	m1 = (AB.A.Y - AB.B.Y) * (CD.A.X - CD.B.X)
+	m2 = (CD.A.Y - CD.B.Y) * (AB.A.X - AB.B.X)
 
-	// General case
-	if o1 != o2 && o3 != o4 {
-		return 1
-	}
-
-	if o1 == COLLINEAR_ORIENTATION && AB.PointOnSegment(CD.A) {
-		return 1
-	}
-
-	if o2 == COLLINEAR_ORIENTATION && AB.PointOnSegment(CD.B) {
-		return 1
-	}
-
-	if o3 == COLLINEAR_ORIENTATION && CD.PointOnSegment(AB.A) {
-		return 1
-	}
-
-	if o4 == COLLINEAR_ORIENTATION && CD.PointOnSegment(AB.B) {
-		return 1
-	}
-
-	return 0
+	return math.Abs(m1-m2) >= EPSILON
 }
 
 /*
@@ -202,19 +164,20 @@ Determines wheter segment AB (this) and PQ (other line) have an intersection, bu
 TODO return intersection as well.
 */
 func (AB *Line) DoesSegmentsIntersect(PQ *Line) bool {
-	var o1, o2, o3, o4, has_intersection int8
+	var o1, o2, o3, o4 int8
+	var has_intersection bool
 	var p_intersection *Point
 	o1 = GetOrientation(AB.A, AB.B, PQ.A)
 	o2 = GetOrientation(AB.A, AB.B, PQ.B)
 	o3 = GetOrientation(PQ.A, PQ.B, AB.A)
-	o3 = GetOrientation(PQ.A, PQ.B, AB.B)
+	o4 = GetOrientation(PQ.A, PQ.B, AB.B)
 
 	if o1+o2+o3+o4 == 0 { // Segments AB and PQ overlap.
 		return false
 	}
 
 	has_intersection = AB.HasIntersection(PQ)
-	if has_intersection != 0 {
+	if !has_intersection {
 		return false
 	}
 
@@ -231,9 +194,9 @@ func (AB *Line) DoesSegmentsOverlap(PQ *Line) bool {
 	o1 = GetOrientation(AB.A, AB.B, PQ.A)
 	o2 = GetOrientation(AB.A, AB.B, PQ.B)
 	o3 = GetOrientation(PQ.A, PQ.B, AB.A)
-	o3 = GetOrientation(PQ.A, PQ.B, AB.B)
+	o4 = GetOrientation(PQ.A, PQ.B, AB.B)
 
-	if o1+o2+o3+o4 == 0 && PQ.PointOnSegment(AB.A) || PQ.PointOnSegment(AB.B) || AB.PointOnSegment(PQ.A) || AB.PointOnSegment(PQ.B) {
+	if o1+o2+o3+o4 == 0 && (PQ.PointOnSegment(AB.A) || PQ.PointOnSegment(AB.B) || AB.PointOnSegment(PQ.A) || AB.PointOnSegment(PQ.B)) {
 		return true
 	}
 	return false

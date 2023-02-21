@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 /*
 Defines wheter or not a point 'P' is a intersection point between a pair of segments, furthermore, in case its
 an intersection the direction of the vector is defined by 'entering'. Aditionally, the intersection point's
@@ -38,4 +40,8 @@ Recieves a PointEntering and return true if both are equal, false otherwise
 */
 func (Pe *PointEntering) Equal(Po *PointEntering) bool {
 	return Pe.P.Equal(Po.P) && Pe.IsEntering == Po.IsEntering && Pe.Intersection == Po.Intersection
+}
+
+func (pe *PointEntering) String() string {
+	return fmt.Sprintf("P: %v, Intersection: %v, IsEntering: %v, IsIncomplete: %v, IsSingle: %v", pe.P.ToString(), pe.Intersection, pe.IsEntering, pe.IsIncomplete, pe.IsSingle)
 }

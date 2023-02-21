@@ -40,8 +40,8 @@ func (wa *WeilerAtherton) CheckPointsInPerimeter() {
 func (wa *WeilerAtherton) SortClippingPolygonIntersections() {
 	var A, P, Q *models.Point
 
-	for i := 0; i < len(*wa.ClippedPolygon.Points); i++ {
-		A = (*wa.ClippedPolygon.Points)[i]
+	for i := 0; i < len(*wa.ClippingPolygon.Points); i++ {
+		A = (*wa.ClippingPolygon.Points)[i]
 
 		sort.Slice(wa.BorderIntersections[i], func(x, y int) bool {
 			var a, b float64
@@ -69,8 +69,8 @@ func (wa *WeilerAtherton) handleOverlappingSegments(A, B, P, Q *models.Point, i,
 			return
 		}
 
-		wa.BorderIntersections[i] = append(wa.BorderIntersections[i], models.NewBorderPoint(B, j, true, true, false))
-		wa.BorderIntersections[i] = append(wa.BorderIntersections[i], models.NewBorderPoint(Q, j, true, true, true))
+		wa.BorderIntersections[i] = append(wa.BorderIntersections[i], models.NewBorderPoint(Q, j, true, true, false))
+		wa.BorderIntersections[i] = append(wa.BorderIntersections[i], models.NewBorderPoint(B, j, true, true, true))
 		return
 	}
 
@@ -83,7 +83,7 @@ func (wa *WeilerAtherton) handleIntersectingSegments(A, B, P, Q *models.Point, i
 	var AB, PQ *models.Line = models.NewLine(A, B), models.NewLine(P, Q)
 	var Intersection *models.Point = AB.IntersectionPointOnALine(PQ)
 	var previousIndex, nextIndex, nextNextIndex = (i - 1 + n) % n, (i + 1) % n, (i + 2) % n
-	var currentPoint, nextPoint bool
+	// var currentPoint, nextPoint bool
 
 	// Point can't appear twice on list
 	if P.Equal(Intersection) {
@@ -114,15 +114,7 @@ func (wa *WeilerAtherton) handleIntersectingSegments(A, B, P, Q *models.Point, i
 
 	// Checking the validity of intersection point
 	if Intersection.Equal(Q) {
-		// Intersection point equal to point of clipped_polygon
-		currentPoint = wa.ClippedPolygon.PointInPolygon(A)
-		nextPoint = wa.ClippedPolygon.PointInPolygon(B)
-
-		if currentPoint != nextPoint {
-			// Intersection is valid, as we have a direction being inside or outside the polygon.
-			wa.BorderIntersections[i] = append(wa.BorderIntersections[i], models.NewDefaultBorderPoint(Intersection, j))
-		}
-
+		wa.BorderIntersections[i] = append(wa.BorderIntersections[i], models.NewBorderPoint(Intersection, j, true, false, false))
 		return
 	}
 
@@ -179,6 +171,7 @@ func (wa *WeilerAtherton) BuildClippingAndClippedPolygonLists() {
 	var nextIndex, previousIndex, n int
 	wa.CheckPointsInPerimeter()
 	wa.GetSegmentIntersections()
+	wa.SortClippingPolygonIntersections()
 
 	// Building preliminar clipping_polygon_list and clipped_polygon_list.
 	for i := 0; i < len(*wa.ClippingPolygon.Points); i++ {
@@ -234,7 +227,7 @@ func (wa *WeilerAtherton) BuildClippingAndClippedPolygonLists() {
 		}
 
 		previousIndex = (i - 1 + n) % n
-		for wa.ClippedPolygonList[previousIndex].P.Equal(PE.P) {
+		for wa.ClippingPolygonList[previousIndex].P.Equal(PE.P) {
 			// Grabs the first previous point that it's different from current one.
 			previousIndex = (previousIndex - 1 + n) % n
 		}
@@ -290,6 +283,7 @@ func (wa *WeilerAtherton) GetIntersectionPolygons() []*models.Polygon {
 	wa.ClippingPolygon.SortClockwise()
 
 	if wa.ClippingPolygon.InsidePolygon(wa.ClippedPolygon) {
+		wa.ClippingPolygon.DeleteCollinearSegments()
 		return []*models.Polygon{wa.ClippingPolygon}
 	}
 
@@ -334,7 +328,7 @@ func (wa *WeilerAtherton) GetIntersectionPolygons() []*models.Polygon {
 					continue
 				}
 
-				// We found exit from ClippingPolygon listo into ClippedPolygon list.
+				// We found exit from ClippingPolygon list into ClippedPolygon list.
 				for j := 0; j < m; j++ {
 					if !wa.ClippedPolygonList[j].Equal(wa.ClippingPolygonList[idx]) {
 						continue
@@ -378,6 +372,11 @@ func (wa *WeilerAtherton) GetIntersectionPolygons() []*models.Polygon {
 			}
 		}
 
+		if len(*intersectionPolygon.Points) == 1 {
+			// This could happen due to Breaking Loop causing some special handling polygon.
+			continue
+		}
+		intersectionPolygon.DeleteRepeatedPoints()
 		intersectionPolygon.DeleteCollinearSegments()
 		intersectionPolygons = append(intersectionPolygons, intersectionPolygon)
 	}
@@ -385,14 +384,15 @@ func (wa *WeilerAtherton) GetIntersectionPolygons() []*models.Polygon {
 	if len(intersectionPolygons) == 0 {
 		// It's possible that ClippedPolygon it's inside clipping_polygon.
 		if wa.ClippedPolygon.InsidePolygon(wa.ClippingPolygon) {
-			return []*models.Polygon{wa.ClippingPolygon}
+			return []*models.Polygon{wa.ClippedPolygon}
 		}
 	}
 
 	return intersectionPolygons
 }
 
-// Make sure to pass a copy of Polygon to this function.
+// Calculates the polygon intersections (if any) between camera footprint of 'camera' and some 'polygon' defined as
+// interest zone. Make sure to pass a copy of Polygon to this function.
 func CalculatePolygonIntersection(camera *models.Camera, polygon *models.Polygon) (bool, *[]*models.Polygon) {
 	var cameraFootprint *models.Polygon = camera.CameraFootprint.ToWeilerAthertonRepresentation()
 	var copyPolygon *models.Polygon = polygon.Copy()
