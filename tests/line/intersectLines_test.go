@@ -18,7 +18,7 @@ func TestTwoLinesIntersect(t *testing.T) {
 		L := lines[i][0]
 		R := lines[i][1]
 		result := L.HasIntersection(&R)
-		if result != 1 {
+		if !result {
 			t.Errorf("Error in test #%v.1! The lines intersect.", i)
 		}
 	}
@@ -37,7 +37,7 @@ func TestTwoLinesThatSharesOnePointIntersect(t *testing.T) {
 		L := lines[i][0]
 		R := lines[i][1]
 		result := L.HasIntersection(&R)
-		if result != 1 {
+		if !result {
 			t.Errorf("Error in test #%v.1! The lines intersect.", i)
 		}
 
