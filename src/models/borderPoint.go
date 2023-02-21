@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 /*
 Contains information about point 'P' like if it's on border of polygon, its index on another polygon in case is border,
 if it belongs to a segment of border points and in case it belongs to some segment of border points it tells wheter
@@ -36,4 +38,8 @@ func NewBorderPoint(P *Point, idx int, isBorder, isSegment, isEnd bool) *BorderP
 		Index:    idx,
 		IsBorder: isBorder, IsSegment: isSegment, IsEnd: isEnd,
 	}
+}
+
+func (bp *BorderPoint) String() string {
+	return fmt.Sprintf("P: %v, Index: %v, IsBorder: %v, IsSegment: %v, IsEnd: %v", bp.P.ToString(), bp.Index, bp.IsBorder, bp.IsSegment, bp.IsEnd)
 }
