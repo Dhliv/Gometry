@@ -20,6 +20,10 @@ func NewPoint(x, y float64) *Point {
 	return &Point{X: x, Y: y}
 }
 
+func (P Point) String() string {
+	return fmt.Sprintf("(%v, %v)", P.X, P.Y)
+}
+
 // Rotates the actual point by 'beta' degrees in counter-clocwise.
 func (P *Point) Rotate(beta float64) {
 	x := math.Cos(beta)*P.X - math.Sin(beta)*P.Y
@@ -36,10 +40,7 @@ func (P *Point) Translate(translationPoint *Point) {
 
 // Recieves a Point and return true if both are equal, false otherwise
 func (Pe *Point) Equal(P *Point) bool {
-	if math.Abs(Pe.X-P.X) > EPSILON || math.Abs(Pe.Y-P.Y) > EPSILON {
-		return false
-	}
-	return true
+	return math.Abs(Pe.X-P.X) <= EPSILON && math.Abs(Pe.Y-P.Y) <= EPSILON
 }
 
 func (Pe *Point) DotProduct(P *Point) float64 {
@@ -48,7 +49,12 @@ func (Pe *Point) DotProduct(P *Point) float64 {
 
 // Transform point to string literal in the form (x, y).
 func (P *Point) ToString() string {
-	return fmt.Sprintf("(%v, %v)", P.X, P.Y)
+	return fmt.Sprintf("(%.2f, %.2f)", P.X, P.Y)
+}
+
+// Returns a copy of current point.
+func (P *Point) Copy() *Point {
+	return NewPoint(P.X, P.Y)
 }
 
 // Calculates the norm of 'vector' to 'origin'.
